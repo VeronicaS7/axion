@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axion - Test Runner Automatizado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #121826;
+      --bg-surface: #1e2640;
+      --border-color: #2b385c;
+      --primary: #0084ff;
+      --success: #10b981;
+      --error: #ef4444;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+    }
+    
+    .status-summary {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .badge {
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .badge-passed { background-color: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-failed { background-color: rgba(239, 68, 68, 0.15); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.3); }
+    
+    .test-suite-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .suite-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .test-item {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .test-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .test-info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .test-result {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    
+    .test-result.passed { color: var(--success); }
+    .test-result.failed { color: var(--error); }
+    
+    .error-details {
+      margin-top: 8px;
+      background-color: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 4px;
+      padding: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #fda4af;
+      width: 100%;
+      word-break: break-all;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div>
+        <h1>Axion Test Runner</h1>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Validação de Integridade e Lógica do MVP</p>
+      </div>
+      <div class="status-summary">
+        <span class="badge badge-passed" id="summary-passed"><i data-lucide="check"></i> 0 Passados</span>
+        <span class="badge badge-failed" id="summary-failed"><i data-lucide="x"></i> 0 Falhos</span>
+      </div>
+    </header>
+
+    <main id="suites-container">
+      <!-- Inserido dinamicamente -->
+    </main>
+  </div>
+
+  <!-- Elementos de Sandbox para testes de UI / App -->
+  <div id="test-sandbox" style="display: none;">
+    <div id="personalized-rec-title"></div>
+    <div id="personalized-rec-desc"></div>
+    <div class="personalized-rec-card"></div>
+  </div>
+
+  <!-- Carregar dependências locais emulando o ambiente SPA -->
+  <script src="/js/config.js"></script>
+  <script>
+    // Sobrescrever isDemoMode para os testes rodarem independentemente de chaves ativas
+    window.CONFIG.isDemoMode = true;
+    window.IS_TEST_ENV = true; // Evita auto-inicialização do App.js
+  </script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/adaptive.js"></script>
+  <script src="/js/tracker.js"></script>
+  <script src="/js/simulation.js"></script>
+  <script src="/app.js"></script>
+
+  <!-- Script Executor do Teste -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      runTests();
+    });
+
+    async function runTests() {
+      const results = [];
+      let passedCount = 0;
+      let failedCount = 0;
+
+      const suites = {
+        "Teste de Lógica: Correção de Exercícios": [
+          {
+            name: "Múltipla Escolha - Alternativa Correta Álgebra (Magnitude)",
+            fn: async () => {
+              // Simulando usuário logado
+              await window.Auth.signUp("Tester", "test@eng.com", "password123");
+              
+              const result = await window.Tracker.submitAnswer(
+                "a_alg_1", // Atividade 1 Álgebra
+                "o_alg_1_1", // Opção correta
+                null
+              );
+              
+              assertEqual(result.is_correct, true, "is_correct deve ser TRUE");
+              assertEqual(result.points_earned, 10, "Pontos ganhos devem ser 10");
+            }
+          },
+          {
+            name: "Múltipla Escolha - Alternativa Incorreta",
+            fn: async () => {
+              const result = await window.Tracker.submitAnswer(
+                "a_alg_1", 
+                "o_alg_1_2", // Incorreta
+                null
+              );
+              assertEqual(result.is_correct, false, "is_correct deve ser FALSE");
+              assertEqual(result.points_earned, 0, "Pontos ganhos devem ser 0");
+            }
+          },
+          {
+            name: "Entrada Numérica - Dentro da Tolerância (7.0 +- 0.05)",
+            fn: async () => {
+              const result1 = await window.Tracker.submitAnswer(
+                "a_amd_2", // Exercício AMD nota ponderada
+                null,
+                7.02 // Correto dentro da tolerância de 0.05
+              );
+              assertEqual(result1.is_correct, true, "7.02 deve ser aceito");
+            }
+          },
+          {
+            name: "Entrada Numérica - Fora da Tolerância",
+            fn: async () => {
+              const result2 = await window.Tracker.submitAnswer(
+                "a_amd_2", 
+                null,
+                6.8 // Incorreto, fora da tolerância de 0.05
+              );
+              assertEqual(result2.is_correct, false, "6.8 está fora e deve falhar");
+            }
+          }
+        ],
+        "Teste de Fluxo: Evolução de Progresso": [
+          {
+            name: "Avanço de Porcentagem e Desbloqueio de Aulas",
+            fn: async () => {
+              const user = window.Auth.getCurrentUser();
+              const oldProgress = window.Tracker._getDemoProgress(user.id);
+              
+              // Responder corretamente as atividades da aula 1 de Álgebra Linear
+              await window.Tracker.submitAnswer("a_alg_1", "o_alg_1_1"); // correto
+              await window.Tracker.submitAnswer("a_alg_2", null, 8); // correto
+              await window.Tracker.submitAnswer("a_alg_3", "o_alg_3_1"); // correto
+              
+              const newProgress = window.Tracker._getDemoProgress(user.id);
+              
+              assertEqual(newProgress.lessons["l_alg_1_1"].status, "completed", "Aula 1 de Álgebra deve ser marcada como concluída");
+              assertEqual(newProgress.lessons["l_amd_1_1"].status, "available", "Aula 1 de AMD deve ter sido desbloqueada");
+            }
+          }
+        ],
+        "Teste de Lógica: Tutor IA Socrático (6 Níveis)": [
+          {
+            name: "Resolução e ajuda socrática progressiva (Aula de Álgebra)",
+            fn: () => {
+              const app = new window.App();
+              app.activeSteps = [
+                {
+                  step_type: "activity",
+                  activity: {
+                    id: "a_alg_1",
+                    statement: "Magnitude do vetor."
+                  }
+                }
+              ];
+              app.currentStepIndex = 0;
+
+              // Nível 1
+              const response1 = app.generateSocraticResponse("dica", 1);
+              assertEqual(response1.includes("Nível 1 (Pergunta Orientadora):"), true, "Nível 1 deve estar correto");
+
+              // Nível 2
+              const response2 = app.generateSocraticResponse("dica", 2);
+              assertEqual(response2.includes("Nível 2 (Dica):"), true, "Nível 2 deve estar correto");
+
+              // Nível 3
+              const response3 = app.generateSocraticResponse("dica", 3);
+              assertEqual(response3.includes("Nível 3 (Conceito):"), true, "Nível 3 deve estar correto");
+
+              // Nível 4
+              const response4 = app.generateSocraticResponse("dica", 4);
+              assertEqual(response4.includes("Nível 4 (Analogia):"), true, "Nível 4 deve estar correto");
+
+              // Nível 5
+              const response5 = app.generateSocraticResponse("dica", 5);
+              assertEqual(response5.includes("Nível 5 (Guia):"), true, "Nível 5 deve estar correto");
+
+              // Nível 6
+              const response6 = app.generateSocraticResponse("dica", 6);
+              assertEqual(response6.includes("Nível 6 (Solução):"), true, "Nível 6 deve estar correto");
+
+              // Nível acima do limite (deve cair no nível 6)
+              const response7 = app.generateSocraticResponse("dica", 7);
+              assertEqual(response7.includes("Nível 6 (Solução):"), true, "Nível 7 deve cair no teto do Nível 6");
+            }
+          }
+        ],
+        "Teste de Lógica: Recomendações Inteligentes": [
+          {
+            name: "Regra 1: Fila de revisão não vazia (Álgebra)",
+            fn: () => {
+              const app = new window.App();
+              const progress = {
+                review_items: [
+                  {
+                    lesson_id: "l_alg_1_1",
+                    lesson_title: "Representando informações com vetores"
+                  }
+                ],
+                attempts: [],
+                track_percentage: 0
+              };
+              app.updateRuleBasedRecommendation(progress);
+
+              const recTitle = document.getElementById("personalized-rec-title").textContent;
+              const recDesc = document.getElementById("personalized-rec-desc").textContent;
+
+              assertEqual(recTitle, "Revisão de Erro: Representando informações com vetores", "Título da recomendação de revisão incorreto");
+              assertEqual(recDesc.includes("Você apresentou dificuldade com vetores"), true, "Justificativa da recomendação incorreta");
+            }
+          },
+          {
+            name: "Regra 2: Padrão / Álgebra Incompleta",
+            fn: () => {
+              const app = new window.App();
+              const progress = {
+                review_items: [],
+                attempts: [],
+                lessons: {
+                  "l_alg_1_1": { status: "available" }
+                },
+                track_percentage: 0
+              };
+              app.updateRuleBasedRecommendation(progress);
+
+              const recTitle = document.getElementById("personalized-rec-title").textContent;
+              const recDesc = document.getElementById("personalized-rec-desc").textContent;
+
+              assertEqual(recTitle, "Iniciar: Álgebra Linear", "Título para Álgebra incorreto");
+              assertEqual(recDesc.includes("Aprenda a linguagem dos vetores"), true, "Descrição incorreta");
+            }
+          },
+          {
+            name: "Regra 3: Álgebra Completa, Recomenda Cálculo Numérico",
+            fn: () => {
+              const app = new window.App();
+              const progress = {
+                review_items: [],
+                attempts: [{ is_correct: true }],
+                lessons: {
+                  "l_alg_1_1": { status: "completed" },
+                  "l_num_1_1": { status: "available" }
+                },
+                track_percentage: 25
+              };
+              app.updateRuleBasedRecommendation(progress);
+
+              const recTitle = document.getElementById("personalized-rec-title").textContent;
+              const recDesc = document.getElementById("personalized-rec-desc").textContent;
+
+              assertEqual(recTitle, "Continuar: Cálculo Numérico", "Título para Cálculo incorreto");
+              assertEqual(recDesc.includes("Aprenda por que precisamos de aproximações"), true, "Descrição incorreta");
+            }
+          },
+          {
+            name: "Regra 4: Concluiu todas as aulas (100% de progresso)",
+            fn: () => {
+              const app = new window.App();
+              const progress = {
+                review_items: [],
+                attempts: [],
+                lessons: {
+                  "l_alg_1_1": { status: "completed" },
+                  "l_num_1_1": { status: "completed" },
+                  "l_mat_1_1": { status: "completed" },
+                  "l_amd_1_1": { status: "completed" }
+                },
+                track_percentage: 100
+              };
+              app.updateRuleBasedRecommendation(progress);
+
+              const recTitle = document.getElementById("personalized-rec-title").textContent;
+              const recDesc = document.getElementById("personalized-rec-desc").textContent;
+
+              assertEqual(recTitle, "Desafio Prático no Laboratório", "Título para laboratório incorreto");
+              assertEqual(recDesc.includes("balanceamento de linha"), true, "Descrição incorreta");
+            }
+          }
+        ],
+        "Teste de Lógica: Motor Adaptativo e Geração": [
+          {
+            name: "Geração determinística e validação de todas as 12 habilidades",
+            fn: () => {
+              const skills = Object.keys(window.AdaptiveEngine.skills);
+              assertEqual(skills.length, 12, "Devem existir exatamente 12 habilidades.");
+              
+              skills.forEach(skillId => {
+                const act = window.AdaptiveEngine.generateActivity(skillId, 2, 0.12345);
+                assertEqual(act !== null, true, `Atividade para ${skillId} deve ser gerada com sucesso.`);
+                assertEqual(act.skill_id, skillId, "skill_id correspondente incorreto.");
+                
+                const valResult = window.AdaptiveEngine.validateActivity(act);
+                assertEqual(valResult.is_valid, true, `Validação automática deve passar para ${skillId}: ${valResult.errors.join(", ")}`);
+              });
+            }
+          },
+          {
+            name: "Unicidade de alternativa correta e ausência de duplicatas em Múltipla Escolha",
+            fn: () => {
+              const act = window.AdaptiveEngine.generateActivity("s_vector_rep", 2, 0.54321);
+              assertEqual(act.activity_type, "multiple_choice", "Deve ser múltipla escolha.");
+              assertEqual(act.options_json.length >= 2, true, "Deve conter pelo menos 2 alternativas.");
+              
+              const corrects = act.options_json.filter(o => o.is_correct);
+              assertEqual(corrects.length, 1, "Deve conter exatamente uma alternativa correta.");
+              
+              const contents = act.options_json.map(o => o.content);
+              const hasDupes = contents.some((item, index) => contents.indexOf(item) !== index);
+              assertEqual(hasDupes, false, "Não deve conter alternativas duplicadas.");
+            }
+          },
+          {
+            name: "Ajuste de Dificuldade e Domínio (Maestria)",
+            fn: () => {
+              const current = { mastery_score: 50, confidence_score: 50, correct_attempts: 2, incorrect_attempts: 1, hints_used: 0 };
+              
+              // Acerto sem dicas
+              const next1 = window.AdaptiveEngine.updateStudentMastery(current, true, 0);
+              assertEqual(next1.mastery_score > 50, true, "Acerto deve subir a maestria.");
+              assertEqual(next1.correct_attempts, 3, "correct_attempts deve ser incrementado.");
+              
+              // Acerto com muitas dicas (penalidade)
+              const next2 = window.AdaptiveEngine.updateStudentMastery(current, true, 4);
+              assertEqual(next2.mastery_score < next1.mastery_score, true, "Uso de dicas deve penalizar o ganho de maestria.");
+              
+              // Erro
+              const next3 = window.AdaptiveEngine.updateStudentMastery(current, false, 0);
+              assertEqual(next3.mastery_score < 50, true, "Erro deve reduzir a maestria.");
+            }
+          },
+          {
+            name: "Fila de Revisão e Repetição Espaçada",
+            fn: () => {
+              // Teste de agendamento de revisão espaçada
+              const reviewCorrect = window.AdaptiveEngine.calculateNextReview(true, 2);
+              assertEqual(reviewCorrect.interval_days, 4, "Acerto deve dobrar o intervalo (2 * 2 = 4).");
+              
+              const reviewIncorrect = window.AdaptiveEngine.calculateNextReview(false, 4);
+              assertEqual(reviewIncorrect.interval_days, 1, "Erro deve resetar o intervalo de revisão para 1 dia.");
+            }
+          },
+          {
+            name: "Classificação de Erros (Taxonomia)",
+            fn: () => {
+              // Mock de atividade com resposta correta numérica = 8
+              const actMock = {
+                activity_type: "numeric_input",
+                correct_answer_json: "8.0"
+              };
+              
+              // Erro de sinal (-8 em vez de 8)
+              const errSign = window.AdaptiveEngine.classifyError(actMock, "-8.0", null);
+              assertEqual(errSign.type, "sign_error", "Deve ser classificado como erro de sinal.");
+              
+              // Erro de arredondamento (8.4 em vez de 8.0)
+              const errRound = window.AdaptiveEngine.classifyError(actMock, "8.4", null);
+              assertEqual(errRound.type, "rounding_error", "Deve ser classificado como erro de arredondamento.");
+              
+              // Erro de cálculo bruto (100 em vez de 8.0)
+              const errCalc = window.AdaptiveEngine.classifyError(actMock, "100.0", null);
+              assertEqual(errCalc.type, "calculation_error", "Deve ser classificado como erro de cálculo.");
+            }
+          },
+          {
+            name: "Escada Socrática de Dicas de 6 Níveis",
+            fn: () => {
+              const act = window.AdaptiveEngine.generateActivity("s_vector_rep", 1, 0.999);
+              assertEqual(act.hints_json.length, 6, "Deve conter exatamente 6 dicas.");
+              
+              // Verificar se cada nível inicia apropriadamente
+              assertEqual(act.hints_json[0].includes("Nível 1"), true, "Dica 1 deve ser Nível 1.");
+              assertEqual(act.hints_json[1].includes("Nível 2"), true, "Dica 2 deve ser Nível 2.");
+              assertEqual(act.hints_json[5].includes("Nível 6"), true, "Dica 6 deve ser Nível 6.");
+            }
+          }
+        ]
+      };
+
+      const container = document.getElementById("suites-container");
+      container.innerHTML = "";
+
+      for (const suiteName in suites) {
+        const suite = suites[suiteName];
+        
+        const suiteCard = document.createElement("div");
+        suiteCard.className = "test-suite-card";
+        suiteCard.innerHTML = `
+          <div class="suite-title">
+            <i data-lucide="package-open"></i>
+            <span>${suiteName}</span>
+          </div>
+          <div class="test-list"></div>
+        `;
+        
+        const list = suiteCard.querySelector(".test-list");
+        
+        for (const test of suite) {
+          const item = document.createElement("div");
+          item.className = "test-item";
+          
+          let statusText = "Running";
+          let statusClass = "";
+          let errText = "";
+          
+          try {
+            await test.fn();
+            statusText = "PASSED";
+            statusClass = "passed";
+            passedCount++;
+          } catch (e) {
+            statusText = "FAILED";
+            statusClass = "failed";
+            errText = e.message || e;
+            failedCount++;
+          }
+          
+          item.innerHTML = `
+            <div>
+              <div class="test-info">
+                <h4>${test.name}</h4>
+                <p>Asserções executadas com sucesso.</p>
+              </div>
+              <div class="error-details" id="err-${test.name.replace(/\s/g, '')}">${errText}</div>
+            </div>
+            <div class="test-result ${statusClass}">
+              <i data-lucide="${statusText === 'PASSED' ? 'check-circle-2' : 'x-circle'}"></i>
+              <span>${statusText}</span>
+            </div>
+          `;
+          
+          if (errText) {
+            item.querySelector(".error-details").style.display = "block";
+            item.querySelector(".test-info p").textContent = "Falha na validação lógica:";
+          }
+          
+          list.appendChild(item);
+        }
+        
+        container.appendChild(suiteCard);
+      }
+
+      // Atualizar badges do topo
+      document.getElementById("summary-passed").innerHTML = `<i data-lucide="check"></i> ${passedCount} Passados`;
+      document.getElementById("summary-failed").innerHTML = `<i data-lucide="x"></i> ${failedCount} Falhos`;
+      
+      lucide.createIcons();
+    }
+
+    // Funções utilitárias de Assertion
+    function assertEqual(actual, expected, message) {
+      if (actual !== expected) {
+        throw new Error(`${message || "Valores diferentes"}: Esperava [${expected}], mas obteve [${actual}]`);
+      }
+    }
+  </script>
+</body>
+</html>

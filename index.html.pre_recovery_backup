@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axion - Academia Interativa de Engenharia</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Aprenda engenharia de forma ativa por meio de simulações, tomada de decisões e desafios reais. Inspirado no Brilliant.">
+  <meta name="author" content="Axion Team">
+  
+  <!-- Google Fonts: Manrope (Body), Instrument Serif (Editorial), Inter (UI), Outfit (Titles) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>
+    if (typeof window.gsap === "undefined") {
+      console.warn("GSAP CDN failed to load. Using no-op fallback to prevent app breakage.");
+      const noop = (target, vars) => { if (vars && vars.onComplete) setTimeout(vars.onComplete, 0); return { delay: () => {}, duration: () => {} }; };
+      window.gsap = {
+        to: noop,
+        fromTo: noop,
+        set: noop,
+        timeline: () => ({ to: noop, fromTo: noop, add: () => {}, play: () => {}, reverse: () => {} })
+      };
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Estilos Globais -->
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/landing.css">
+  <link rel="stylesheet" href="/mobile.css">
+</head>
+<body>
+
+  <!-- Ambient Background for Liquid Glass Effect -->
+  <div id="ambient-background">
+    <div class="ambient-blob b1"></div>
+    <div class="ambient-blob b2"></div>
+    <div class="ambient-blob b3"></div>
+  </div>
+
+  <!-- App Wrapper -->
+  <div id="app-container">
+    
+    <!-- Menu Lateral Esquerdo (ou barra inferior no Mobile) -->
+    <header id="global-header" class="glass-panel">
+      <div class="header-content">
+        <!-- Logo -->
+        <div class="logo" id="header-logo">
+          <i data-lucide="triangle" class="logo-icon"></i>
+          <span>Axion</span>
+        </div>
+        
+        <!-- Menu Principal -->
+        <nav class="nav-links">
+          <button class="nav-item active" data-screen="home" id="nav-home">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Início</span>
+          </button>
+          <button class="nav-item" data-screen="explore" id="nav-explore">
+            <i data-lucide="compass"></i>
+            <span>Explorar</span>
+          </button>
+          <button class="nav-item" data-screen="area-production" id="nav-track">
+            <i data-lucide="map"></i>
+            <span>Trilhas</span>
+          </button>
+          <button class="nav-item" data-screen="lab" id="nav-lab">
+            <i data-lucide="flask-conical"></i>
+            <span>Laboratório</span>
+          </button>
+          <button class="nav-item" data-screen="tutor" id="nav-tutor">
+            <i data-lucide="bot"></i>
+            <span>Professor</span>
+          </button>
+          <button class="nav-item" data-screen="profile" id="nav-profile">
+            <i data-lucide="user"></i>
+            <span>Progresso</span>
+          </button>
+        </nav>
+        
+        <!-- Ações do Cabeçalho / Barra Lateral -->
+        <div class="header-actions">
+          <div class="user-score-badge" title="XP acumulado">
+            <i data-lucide="award" class="score-icon"></i>
+            <span id="header-score">0 XP</span>
+          </div>
+          
+          <button class="btn-logout-sidebar" id="btn-logout">
+            <i data-lucide="log-out"></i>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container para telas dinâmicas -->
+    <main id="main-content">
+
+      <!-- ===================================================================
+           TELA 1: ONBOARDING / LANDING (PÚBLICA)
+           =================================================================== -->
+      <section class="screen active" id="screen-onboarding" style="padding: 0; margin-left: calc(-1 * var(--sidebar-width)); width: 100vw; max-width: 100vw; min-height: 100vh; overflow-x: hidden;">
+        
+        <!-- Public Navbar -->
+        <nav class="public-navbar">
+          <div class="nav-container">
+            <div class="logo">
+              <i data-lucide="triangle" class="logo-icon"></i>
+              <span>Axion</span>
+            </div>
+            <div class="nav-links-center">
+              <a href="#why">Por que a Axion</a>
+              <a href="#how">Como funciona</a>
+              <a href="#experience">Experiência</a>
+              <a href="#courses">Cursos</a>
+            </div>
+            <div class="nav-actions">
+              <button class="btn-secondary" id="btn-nav-login">Entrar</button>
+              <button class="btn-primary" id="btn-nav-signup">Começar agora</button>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero-section">
+          <div class="hero-left">
+            <div class="onboarding-badge">
+              <i data-lucide="sparkles"></i>
+              <span>ACADEMIA INTERATIVA DE ENGENHARIA</span>
+            </div>
+            <h1 class="hero-title">Engenharia é complexa.<br><span class="hero-title-editorial">Aprender não precisa ser.</span></h1>
+            <p class="hero-desc">
+              A Axion transforma conceitos densos em experiências visuais, desafios interativos e explicações guiadas para você entender antes de decorar.
+            </p>
+            <div class="hero-buttons">
+              <button class="btn-primary" id="btn-hero-start">Começar minha jornada</button>
+              <button class="btn-secondary" data-scroll="why">Conhecer a Axion</button>
+            </div>
+            <p class="hero-footer-text">Álgebra Linear · Cálculo Numérico · Ciência dos Materiais · Decisão Multicritério</p>
+          </div>
+          <div class="hero-right">
+            <!-- Visual Conceitual -->
+            <div class="hero-art-container">
+               <div class="abstract-grid"></div>
+               <div class="abstract-curve"></div>
+               <div class="abstract-matrix">
+                 <span>[ 1.0  0.5 ]</span>
+                 <span>[ 0.2  2.1 ]</span>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção: O Problema -->
+        <div class="section-editorial" id="why">
+          <div class="section-indicator">POR QUE A AXION EXISTE</div>
+          <h2 class="editorial-title">O problema nem sempre é a matéria.<br>Às vezes, é a forma como ela foi ensinada.</h2>
+          <div class="editorial-text">
+            <p>Fórmulas aparecem antes da intuição.</p>
+            <p>Definições chegam antes do problema.</p>
+            <p>Exercícios são resolvidos sem mostrar por que aquele raciocínio funciona.</p>
+            <p>E, aos poucos, conteúdos importantes como álgebra, cálculo e física se transformam em páginas para memorizar — não em ideias para compreender.</p>
+          </div>
+          <p class="editorial-conclusion">A Axion nasceu para inverter essa ordem.</p>
+        </div>
+
+        <!-- Seção: Metodologia -->
+        <div class="section-methodology" id="how">
+          <div class="section-indicator">UMA NOVA ORDEM</div>
+          <h2 class="editorial-title">Primeiro você observa.<br>Depois entende.<br>Só então calcula.</h2>
+          <p class="methodology-intro">Cada experiência da Axion começa pelo problema, não pela fórmula.</p>
+          
+          <div class="methodology-blocks">
+            <div class="m-block">
+              <span class="m-number">01</span>
+              <h3>Observe</h3>
+              <p>Explore uma situação, um sistema, um gráfico ou um fenômeno antes de receber a definição.</p>
+            </div>
+            <div class="m-block">
+              <span class="m-number">02</span>
+              <h3>Interprete</h3>
+              <p>Faça previsões, compare comportamentos e construa uma ideia intuitiva do que está acontecendo.</p>
+            </div>
+            <div class="m-block">
+              <span class="m-number">03</span>
+              <h3>Formalize</h3>
+              <p>A matemática entra quando você já entende o problema que ela precisa representar.</p>
+            </div>
+            <div class="m-block">
+              <span class="m-number">04</span>
+              <h3>Aplique</h3>
+              <p>Resolva novos desafios, teste variações e leve o conceito para situações de engenharia.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção: Experiência Interativa -->
+        <div class="section-interactive" id="experience">
+           <div class="section-indicator">NÃO É UMA VIDEOAULA</div>
+           <h2 class="editorial-title">Você não assiste à Axion.<br>Você interage com ela.</h2>
+           <p class="interactive-desc">
+             Mude valores.<br>Arraste vetores.<br>Compare métodos.<br>Observe gráficos.<br>Teste hipóteses.<br>Escolha materiais.<br>Tome decisões.<br><br>
+             A interface reage às suas escolhas e transforma cada conceito em uma experiência prática.
+           </p>
+           
+           <!-- Interação Demonstrativa -->
+           <div class="interactive-demo-box">
+             <div class="demo-math">
+               <p>A = (2, 3)</p>
+               <p>B = (4, -1)</p>
+               <p class="demo-question">A + B = ?</p>
+             </div>
+             <div class="demo-visual">
+               <svg viewBox="0 0 100 100" class="demo-svg">
+                 <!-- Grid -->
+                 <path d="M 0 50 L 100 50 M 50 0 L 50 100" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                 <!-- Vector A -->
+                 <line x1="50" y1="50" x2="70" y2="20" stroke="var(--axion-cyan)" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+                 <!-- Vector B -->
+                 <line x1="50" y1="50" x2="90" y2="60" stroke="var(--axion-blue)" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+                 
+                 <defs>
+                   <marker id="arrow-cyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                     <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--axion-cyan)" />
+                   </marker>
+                   <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                     <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--axion-blue)" />
+                   </marker>
+                 </defs>
+               </svg>
+             </div>
+           </div>
+           
+           <button class="btn-primary btn-demo-action" data-navigate="signup">Experimentar um conceito</button>
+        </div>
+
+        <!-- Seção: Aprendizagem Adaptativa -->
+        <div class="section-adaptive">
+           <div class="section-indicator">APRENDER NÃO É SEGUIR UMA FILA</div>
+           <h2 class="editorial-title">A próxima questão depende<br>do que aconteceu na anterior.</h2>
+           <p class="adaptive-desc">
+             Se você erra um sinal, a Axion identifica o padrão.<br><br>
+             Se precisa de muitas dicas, o conceito é reforçado.<br><br>
+             Se demonstra domínio, o desafio evolui.<br><br>
+             O caminho de aprendizagem muda conforme suas respostas, dificuldades e progresso.
+           </p>
+           
+           <div class="adaptive-flow">
+             <span>Erro de sinal</span>
+             <i data-lucide="arrow-down"></i>
+             <span>Explicação visual</span>
+             <i data-lucide="arrow-down"></i>
+             <span>Questão mais simples</span>
+             <i data-lucide="arrow-down"></i>
+             <span>Nova variação</span>
+             <i data-lucide="arrow-down"></i>
+             <span>Retorno ao desafio</span>
+           </div>
+           
+           <p class="adaptive-conclusion">Você não repete a aula.<br>A aula se adapta a você.</p>
+        </div>
+
+        <!-- Seção: Professor -->
+        <div class="section-tutor">
+           <div class="section-indicator">TUTOR CONTEXTUAL</div>
+           <h2 class="editorial-title">Pergunte sem sair da aula.</h2>
+           <p class="tutor-desc">
+             O Tutor Axion conhece o curso, o tópico e a atividade que você está resolvendo.<br><br>
+             Ele pode explicar de outro jeito, criar um exemplo, revisar um pré-requisito ou ajudar você a encontrar o erro.
+           </p>
+           
+           <div class="tutor-mockup">
+             <div class="tutor-mock-msg user">Eu não entendi por que somamos x com x e y com y.</div>
+             <div class="tutor-mock-msg ai">
+               Pense nos componentes como tipos diferentes de informação.<br><br>
+               O eixo x representa o movimento horizontal.<br>
+               O eixo y representa o movimento vertical.<br><br>
+               Somar x com y seria como somar metros percorridos para a direita com metros percorridos para cima e tratar os dois como a mesma direção.<br><br>
+               Vamos visualizar isso?
+             </div>
+             <div class="tutor-mock-actions">
+               <button data-navigate="signup">Explique de outro jeito</button>
+               <button data-navigate="signup">Mostre um exemplo</button>
+               <button data-navigate="signup">Onde eu errei?</button>
+               <button data-navigate="signup">Me desafie</button>
+             </div>
+           </div>
+        </div>
+
+        <!-- Seção: Laboratório -->
+        <div class="section-lab">
+           <div class="section-indicator">LABORATÓRIO AXION</div>
+           <h2 class="editorial-title">Existe uma diferença entre saber uma fórmula e brincar com uma ideia.</h2>
+           <p class="lab-desc">
+             O Laboratório é o espaço para experimentar conceitos sem a pressão de concluir uma aula.<br><br>
+             Explore modelos, descubra curiosidades e teste o que acontece quando as variáveis mudam.
+           </p>
+           
+           <div class="lab-cards-grid">
+             <div class="l-card">
+               <h4>Vetores em movimento</h4>
+               <p>Altere direção e magnitude e observe a soma vetorial em tempo real.</p>
+               <span class="l-course">Álgebra Linear</span>
+             </div>
+             <div class="l-card">
+               <h4>Newton em ação</h4>
+               <p>Escolha uma aproximação inicial e acompanhe o método convergir — ou falhar.</p>
+               <span class="l-course">Cálculo Numérico</span>
+             </div>
+             <div class="l-card">
+               <h4>Dentro de um cristal</h4>
+               <p>Explore células unitárias e descubra como os átomos se organizam.</p>
+               <span class="l-course">Ciência dos Materiais</span>
+             </div>
+             <div class="l-card">
+               <h4>Mude os pesos</h4>
+               <p>Observe como pequenas mudanças de preferência podem alterar uma decisão.</p>
+               <span class="l-course">Decisão Multicritério</span>
+             </div>
+           </div>
+        </div>
+
+        <!-- Seção: Cursos -->
+        <div class="section-courses" id="courses">
+           <div class="section-indicator">COMECE POR UM CAMINHO</div>
+           <h2 class="editorial-title">Quatro cursos.<br>Diferentes formas de pensar.</h2>
+           <p class="courses-intro">A primeira formação da Axion explora fundamentos matemáticos, computacionais, materiais e decisórios presentes na Engenharia de Produção.</p>
+           
+           <div class="courses-large-grid">
+             <div class="c-large-card">
+               <h3>Álgebra Linear</h3>
+               <p>Transforme vetores, matrizes e sistemas lineares em ferramentas para representar dados, recursos e relações.</p>
+               <div class="c-tags">
+                 <span>Vetores</span><span>Matrizes</span><span>Sistemas lineares</span><span>Transformações</span>
+               </div>
+               <button class="btn-secondary" data-navigate="signup">Explorar Álgebra Linear</button>
+             </div>
+             <div class="c-large-card">
+               <h3>Cálculo Numérico</h3>
+               <p>Entenda como computadores encontram soluções aproximadas e por que convergência, erro e estabilidade importam.</p>
+               <div class="c-tags">
+                 <span>Erros</span><span>Raízes</span><span>Interpolação</span><span>Integração</span>
+               </div>
+               <button class="btn-secondary" data-navigate="signup">Explorar Cálculo Numérico</button>
+             </div>
+             <div class="c-large-card">
+               <h3>Ciência dos Materiais</h3>
+               <p>Descubra como átomos, microestruturas e processos determinam o comportamento dos materiais.</p>
+               <div class="c-tags">
+                 <span>Cristais</span><span>Defeitos</span><span>Propriedades</span><span>Diagramas de fase</span>
+               </div>
+               <button class="btn-secondary" data-navigate="signup">Explorar Ciência dos Materiais</button>
+             </div>
+             <div class="c-large-card">
+               <h3>Decisão Multicritério</h3>
+               <p>Estruture problemas complexos e compreenda como critérios, pesos e preferências influenciam uma decisão.</p>
+               <div class="c-tags">
+                 <span>Critérios</span><span>Pesos</span><span>AHP</span><span>TOPSIS</span>
+               </div>
+               <button class="btn-secondary" data-navigate="signup">Explorar Decisão Multicritério</button>
+             </div>
+           </div>
+        </div>
+        
+        <!-- Seção: A Experiência Axion -->
+        <div class="section-experience-minimal">
+           <h2 class="editorial-title">Menos conteúdo para consumir.<br>Mais ideias para explorar.</h2>
+           <div class="mini-indicators">
+             <span>Explique</span>
+             <span>Visualize</span>
+             <span>Teste</span>
+             <span>Erre</span>
+             <span>Entenda</span>
+             <span>Tente novamente</span>
+           </div>
+           <p class="exp-minimal-desc">
+             Aprender engenharia não deveria ser um exercício de resistência contra o cansaço.<br><br>
+             A experiência precisa ajudar você a continuar.
+           </p>
+        </div>
+        
+        <!-- Seção: CTA Final -->
+        <div class="section-cta-final">
+           <div class="section-indicator">A SUA PRÓXIMA AULA PODE SER DIFERENTE</div>
+           <h2 class="editorial-title">Você não precisa decorar antes de entender.</h2>
+           <p class="cta-subtitle">Entre na Axion e comece a explorar engenharia de uma forma mais visual, ativa e guiada.</p>
+           
+           <div class="cta-actions">
+             <button class="btn-primary" data-navigate="signup">Criar minha conta</button>
+             <button class="btn-secondary" data-navigate="auth">Já tenho uma conta</button>
+           </div>
+           <p class="cta-hint">Comece por Álgebra Linear, Cálculo Numérico, Ciência dos Materiais ou Decisão Multicritério.</p>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="public-footer">
+           <div class="footer-top">
+             <div class="footer-brand">
+               <h3>AXION</h3>
+               <p>Academia Interativa de Engenharia</p>
+             </div>
+             <div class="footer-links">
+               <a href="#why">Por que a Axion</a>
+               <a href="#how">Como funciona</a>
+               <a href="#courses">Cursos</a>
+               <a href="#experience">Laboratório</a>
+               <a href="#" data-navigate="auth">Entrar</a>
+             </div>
+           </div>
+           <div class="footer-bottom">
+             <p>Aprenda engenharia observando, testando e entendendo.</p>
+             <p>© Axion. Todos os direitos reservados.</p>
+           </div>
+        </footer>
+
+      </section>
+
+      <!-- ===================================================================
+           TELA 2: AUTENTICAÇÃO (LOGIN / CADASTRO)
+           =================================================================== -->
+      <section class="screen" id="screen-auth" style="padding: 0; margin-left: calc(-1 * var(--sidebar-width)); width: 100vw; max-width: 100vw; min-height: 100vh; overflow: hidden;">
+        
+        <div class="auth-split-layout">
+          
+          <!-- Lado Visual (55%) -->
+          <div class="auth-visual-side">
+            <div class="auth-visual-logo" data-navigate="onboarding" style="cursor:pointer;">
+              <i data-lucide="triangle" style="transform: rotate(90deg); fill: var(--axion-cyan);"></i>
+              <span>AXION</span>
+            </div>
+            <div class="auth-visual-art">
+              <!-- Paisagem abstrata (matrizes, curvas, grids) -->
+              <div class="abstract-grid"></div>
+              <div class="abstract-curve"></div>
+            </div>
+            <div class="auth-visual-footer">
+              <p>Entender muda a forma como você aprende.</p>
+            </div>
+          </div>
+
+          <!-- Lado Formulário (45%) -->
+          <div class="auth-form-side">
+            
+            <button class="btn-back-auth" id="btn-back-home" style="align-self: flex-start; margin-bottom: 2rem;">
+              <i data-lucide="arrow-left"></i>
+              <span>Voltar</span>
+            </button>
+            
+            <div class="auth-tabs" style="display: none;">
+              <button class="auth-tab-btn active" data-tab="login" id="tab-login-btn">Entrar</button>
+              <button class="auth-tab-btn" data-tab="register" id="tab-register-btn">Criar Conta</button>
+            </div>
+
+            <div class="auth-form-wrapper">
+              
+              <!-- Login -->
+              <div class="auth-form-container active" id="form-login">
+                <h2 class="auth-title">Bem-vindo de volta.</h2>
+                <p class="auth-subtitle-desc">Continue de onde parou e retome sua jornada de aprendizagem.</p>
+                
+                <form id="login-form">
+                  <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <div class="input-wrapper">
+                      <input type="text" id="login-email" required placeholder="seuemail@exemplo.com" autocomplete="email">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <div class="input-wrapper">
+                      <input type="password" id="login-password" required placeholder="Digite sua senha" autocomplete="current-password">
+                    </div>
+                  </div>
+
+                  <div class="auth-extras">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="keep-logged">
+                      <span class="checkmark"></span>
+                      Manter conectado
+                    </label>
+                    <a href="#" id="link-forgot-password" class="auth-link">Esqueci minha senha</a>
+                  </div>
+
+                  <div class="error-banner" id="login-error" style="display: none;"></div>
+
+                  <button type="submit" class="btn-primary btn-block" id="btn-login-submit">
+                    <span>Entrar na Axion</span>
+                  </button>
+                </form>
+                
+                <div class="auth-switch-text">
+                  Ainda não possui uma conta? <a href="#" data-navigate="signup" class="auth-link">Criar conta</a>
+                </div>
+              </div>
+
+              <!-- Cadastro -->
+              <div class="auth-form-container" id="form-register">
+                <h2 class="auth-title">Comece sua jornada.</h2>
+                <p class="auth-subtitle-desc">Crie sua conta e explore uma nova forma de aprender engenharia.</p>
+                
+                <form id="register-form">
+                  <div class="form-group">
+                    <label for="register-name">Nome</label>
+                    <div class="input-wrapper">
+                      <input type="text" id="register-name" required placeholder="Seu nome completo">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="register-email">E-mail</label>
+                    <div class="input-wrapper">
+                      <input type="email" id="register-email" required placeholder="seuemail@exemplo.com" autocomplete="email">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="register-password">Senha</label>
+                    <div class="input-wrapper">
+                      <input type="password" id="register-password" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="register-password-confirm">Confirmar senha</label>
+                    <div class="input-wrapper">
+                      <input type="password" id="register-password-confirm" required minlength="6" placeholder="Digite sua senha novamente">
+                    </div>
+                  </div>
+
+                  <div class="error-banner" id="register-error" style="display: none;"></div>
+
+                  <button type="submit" class="btn-primary btn-block" id="btn-register-submit">
+                    <span>Criar minha conta</span>
+                  </button>
+                </form>
+                
+                <div class="auth-switch-text">
+                  Já possui uma conta? <a href="#" data-navigate="auth" class="auth-link">Entrar</a>
+                </div>
+              </div>
+
+              <!-- Recuperação de Senha -->
+              <div class="auth-form-container" id="form-recovery" style="display: none;">
+                <h2 class="auth-title">Recuperação de Senha</h2>
+                <p class="auth-subtitle-desc">Digite o e-mail cadastrado e enviaremos instruções.</p>
+                
+                <form id="recovery-form">
+                  <div class="form-group">
+                    <label for="recovery-email">E-mail Cadastrado</label>
+                    <div class="input-wrapper">
+                      <input type="email" id="recovery-email" required placeholder="seuemail@exemplo.com">
+                    </div>
+                  </div>
+
+                  <div class="error-banner" id="recovery-error" style="display: none;"></div>
+                  <div class="success-banner" id="recovery-success" style="display: none;"></div>
+
+                  <button type="submit" class="btn-primary btn-block">
+                    <span>Enviar link de recuperação</span>
+                  </button>
+                </form>
+                
+                <div class="auth-switch-text">
+                  <a href="#" id="link-back-login" class="auth-link">Voltar para Login</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 3: PAINEL INICIAL (DASHBOARD REFATORADO)
+           =================================================================== -->
+      <section class="screen" id="screen-home">
+        <div class="dashboard-layout">
+          
+          <!-- Coluna Principal -->
+          <div class="dashboard-main" style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- Primeira Seção: Welcome Banner + Streak -->
+            <div class="dashboard-hero">
+              <div class="welcome-banner">
+                <div>
+                  <h1 class="welcome-title">Olá, <span id="user-display-name">Estudante</span>!</h1>
+                  <p class="welcome-subtitle">Continue desenvolvendo suas competências práticas de engenharia.</p>
+                </div>
+                <div style="margin-top: 16px;">
+                  <button class="btn-primary" id="btn-continue-learning">
+                    <span id="btn-continue-text">Carregando trilha...</span>
+                    <i data-lucide="play"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Progresso Semanal Realizado -->
+              <div class="weekly-progress-card">
+                <span class="weekly-title">SEQUÊNCIA SEMANAL</span>
+                <div class="week-days-row">
+                  <div class="day-dot-wrapper"><div class="day-dot active" id="dot-seg"></div><span class="day-label">S</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-ter"></div><span class="day-label">T</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-qua"></div><span class="day-label">Q</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-qui"></div><span class="day-label">Q</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-sex"></div><span class="day-label">S</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-sab"></div><span class="day-label">S</span></div>
+                  <div class="day-dot-wrapper"><div class="day-dot" id="dot-dom"></div><span class="day-label">D</span></div>
+                </div>
+                <span class="welcome-subtitle" id="user-streak" style="text-align: center; font-weight: 600; margin-top: 8px;">1 dia de estudo</span>
+              </div>
+            </div>
+
+            <!-- Mentor IA (Síntese de Progresso) -->
+            <div class="personalized-rec-card" id="ai-progress-summary-card" style="display: flex; gap: 16px; align-items: flex-start;">
+              <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(121, 206, 210, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i data-lucide="bot" style="width: 24px; height: 24px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <div class="rec-reason-badge"><i data-lucide="sparkles" style="width:12px; height:12px;"></i> Mentor IA</div>
+                <p id="ai-progress-summary" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5;">Gerando análise de progresso personalizada...</p>
+              </div>
+            </div>
+
+            <!-- Aula Recomendada / Progresso -->
+            <div class="recommended-card">
+              <div class="recom-illustration-placeholder">
+                <div class="geom-cog"></div>
+              </div>
+              <div class="recom-info">
+                <div>
+                  <span class="badge-status badge-available">AULA RECOMENDADA</span>
+                  <h2 class="recom-title" id="recom-lesson-title" style="margin-top: 8px; font-size: 20px;">Identificando gargalos de produção</h2>
+                  <p class="recom-desc" id="recom-lesson-desc" style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Mapeie tempos de ciclo, destaque a etapa restritiva do processo e execute cálculos e simulações práticas.</p>
+                </div>
+                <div style="margin-top: 14px;">
+                  <div class="recom-progress-section" style="display: flex; align-items: center; gap: 10px;">
+                    <div class="recom-progress-bar" style="flex: 1; height: 5px; background: var(--border-color); border-radius: 99px; overflow: hidden;">
+                      <div class="recom-progress-fill" id="recom-lesson-progress-bar" style="width: 0%; height: 100%; background: var(--primary);"></div>
+                    </div>
+                    <span class="recom-progress-text" id="recom-lesson-progress-text" style="font-size: 11px; font-weight: 700;">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recomendado Para Você (Justificado por regras) -->
+            <div class="personalized-rec-card">
+              <span class="rec-reason-badge"><i data-lucide="sparkles" style="width:12px; height:12px;"></i> Personalizado para você</span>
+              <h3 id="personalized-rec-title" style="font-family: var(--font-title); font-size: 16px; font-weight: 700; margin-bottom: 4px;">Revisão: Cálculo de Capacidade</h3>
+              <p id="personalized-rec-desc" style="font-size: 13px; color: var(--text-secondary);">Recomendamos esta atividade porque você utilizou 3 dicas graduals no exercício anterior.</p>
+            </div>
+
+
+
+          </div>
+
+          <!-- Coluna Lateral -->
+          <div class="dashboard-sidebar" style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- Atalhos de Prática -->
+            <div class="sidebar-lab-shortcuts">
+              <h3 style="font-family: var(--font-title); font-size: 15px; margin-bottom: 14px;">Atalhos rápidos</h3>
+              <button class="shortcut-btn" id="btn-shortcut-lab"><i data-lucide="flask-conical"></i><span>Laboratório de Processos</span></button>
+              <button class="shortcut-btn" id="btn-shortcut-tutor"><i data-lucide="bot"></i><span>Pedir ajuda ao Tutor</span></button>
+            </div>
+
+            <!-- Revisão Pendente (Spaced Repetition) -->
+            <div class="review-panel">
+              <h3 style="font-family: var(--font-title); font-size: 15px; margin-bottom: 12px;">Fila de Revisão</h3>
+              <p class="review-empty-text" id="review-empty-message">Análise de desempenho limpa! Tudo memorizado.</p>
+              <div class="review-list" id="review-items-list" style="display: none; flex-direction: column; gap: 8px;">
+                <!-- Inserido dinamicamente se houver erros -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 4: EXPLORAR (CATÁLOGO DE ÁREAS)
+           =================================================================== -->
+      <section class="screen" id="screen-explore">
+        <div class="explorar-header">
+          <h1 style="font-family: var(--font-title); font-size: 26px; font-weight: 800;">Catálogo de Engenharia</h1>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Escolha uma área e desenvolva competências de forma 100% ativa.</p>
+        </div>
+
+        <div class="explorar-grid">
+          <!-- Area 1: Engenharia de Produção -->
+          <div class="area-card" data-area="producao" id="area-card-producao">
+            <div class="area-header-row">
+              <div class="area-icon-container"><i data-lucide="layout-grid"></i></div>
+              <span class="badge-status badge-available">Disponível</span>
+            </div>
+            <div>
+              <h3 class="area-title">Engenharia de Produção</h3>
+              <p class="area-desc" style="margin-top: 6px;">Desenvolva competências matemáticas, computacionais, decisórias e tecnológicas aplicadas à análise, melhoria e gestão de sistemas produtivos.</p>
+            </div>
+            <div class="area-meta-row">
+              <span>4 Cursos ativos</span>
+              <span>Iniciante a Intermediário</span>
+            </div>
+          </div>
+
+          <!-- Area 2: Inspetor de Soldagem -->
+          <div class="area-card" data-area="soldagem" id="area-card-soldagem">
+            <div class="area-header-row">
+              <div class="area-icon-container"><i data-lucide="flame"></i></div>
+              <span class="badge-status badge-available">Disponível</span>
+            </div>
+            <div>
+              <h3 class="area-title">Inspetor de Soldagem e Qualidade</h3>
+              <p class="area-desc" style="margin-top: 6px;">Banco de questões focado em terminologia, metalurgia, processos e qualificações para Inspetores de Soldagem N1 e N2.</p>
+            </div>
+            <div class="area-meta-row">
+              <span>1 Curso ativo</span>
+              <span>Avançado</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 4.5: ÁREA DE ENGENHARIA DE PRODUÇÃO
+           =================================================================== -->
+      <section class="screen" id="screen-area-production">
+        <div class="explorar-header" style="margin-bottom: 24px;">
+          <h1 style="font-family: var(--font-title); font-size: 28px; font-weight: 800;">Engenharia de Produção</h1>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Desenvolva e domine competências de otimização, processos e tomada de decisão estratégica.</p>
+        </div>
+
+        <!-- Visão Geral & Progresso -->
+        <div class="dashboard-hero" style="margin-bottom: 30px; display: flex; gap: 20px;">
+          <div class="welcome-banner" style="flex: 1.5; padding: 24px;">
+            <h2 style="font-family: var(--font-title); font-size: 20px; font-weight: 700; margin-bottom: 8px;">Visão Geral da Formação</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+              Esta formação prepara você para analisar, modelar e otimizar sistemas de produção reais. Você aprenderá a modelar dados usando Álgebra Linear, tomar decisões complexas com múltiplos critérios conflitantes, criar aproximações computacionais estáveis por Cálculo Numérico e analisar propriedades mecânicas e microestruturas na Ciência dos Materiais.
+            </p>
+            <div style="font-size: 12px; color: var(--text-primary); font-weight: 600;">
+              <span>Competências Relacionadas: </span>
+              <span style="color: var(--primary);">Modelagem Matricial, Relações de Sobreclassificação, Convergência Iterativa, Ensaios Mecânicos</span>
+            </div>
+          </div>
+          
+          <div class="weekly-progress-card" style="flex: 1; padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <span class="weekly-title" style="font-size: 11px; letter-spacing: 0.1em;">PROGRESSO GERAL DA ÁREA</span>
+            <div class="recom-progress-section" style="display: flex; align-items: center; gap: 10px; margin-top: 12px; width: 100%;">
+              <div class="recom-progress-bar" style="flex: 1; height: 8px; background: var(--border-color); border-radius: 99px; overflow: hidden;">
+                <div class="recom-progress-fill" id="area-progress-fill" style="width: 0%; height: 100%; background: var(--success); transition: width 0.3s ease;"></div>
+              </div>
+              <span class="recom-progress-text" id="area-progress-text" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">0%</span>
+            </div>
+            <p style="font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 8px;">Média dos 4 cursos da formação</p>
+          </div>
+        </div>
+
+        <!-- Quatro Cursos Disponíveis -->
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-family: var(--font-title); font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="book-open" style="color: var(--primary); width: 20px; height: 20px;"></i> Cursos da Formação
+          </h2>
+          <div class="explorar-grid" id="area-courses-list" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+            <!-- Inserido dinamicamente via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 5: TRILHAS (ÁRVORE CONECTADA DE MÓDULOS)
+           =================================================================== -->
+      <section class="screen" id="screen-track">
+        <div class="track-header" style="margin-bottom: 24px;">
+          <a href="#" id="btn-back-to-area" style="color: var(--primary); text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 12px; font-weight: 600; cursor: pointer;">
+            <i data-lucide="arrow-left" style="width:14px; height:14px; vertical-align: middle;"></i> Voltar para Engenharia de Produção
+          </a>
+        </div>
+
+        <div class="track-detail-layout">
+          <!-- Sidebar com Detalhes do Curso -->
+          <div class="course-detail-sidebar glass-card">
+            <div>
+              <h1 class="track-title" id="track-title-text" style="font-family: var(--font-title); font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 8px;">Álgebra Linear</h1>
+              <p class="track-desc" id="track-desc-text" style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Compreenda vetores, matrizes, sistemas lineares e transformações aplicadas a dados, modelagem e otimização.</p>
+            </div>
+
+            <!-- Progresso do Curso -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                <span style="color: var(--text-secondary);">Progresso do Curso</span>
+                <strong id="track-progress-pct-text" style="color: var(--text-primary);">0%</strong>
+              </div>
+              <div class="progress-bar-bg" style="width: 100%; height: 6px; background: var(--bg-primary); border-radius: 99px; overflow: hidden; border: 1px solid var(--border-color);">
+                <div class="progress-bar-fill" id="track-progress-pct-fill" style="width: 0%; height: 100%; background: var(--success); transition: width 0.3s ease;"></div>
+              </div>
+            </div>
+
+            <!-- Metadados -->
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Nível:</span><strong id="track-meta-level">Iniciante</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Duração:</span><strong id="track-meta-duration">12h</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Pré-requisitos:</span><strong id="track-meta-prereqs" style="text-align: right;">Nenhum</strong></div>
+            </div>
+
+            <!-- Objetivos -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <h4 style="font-family: var(--font-title); font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">Aplicações Práticas</h4>
+              <p id="track-meta-apps" style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">Planejamento de produção, alocação de recursos, análise de dados e transições de sistemas industriais.</p>
+            </div>
+
+            <!-- Competências -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <h4 style="font-family: var(--font-title); font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">Competências</h4>
+              <div id="track-meta-skills" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <!-- Inserido via JS -->
+              </div>
+            </div>
+
+            <!-- Ações rápidas de suporte -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+              <button class="shortcut-btn" id="btn-track-tutor" style="width: 100%; justify-content: center; background: rgba(0, 132, 255, 0.1); border: 1px solid rgba(0, 132, 255, 0.3); color: var(--primary);"><i data-lucide="bot"></i><span>Pedir ajuda ao Tutor</span></button>
+              <button class="shortcut-btn" id="btn-track-lab" style="width: 100%; justify-content: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--success);"><i data-lucide="flask-conical"></i><span>Laboratório Relacionado</span></button>
+            </div>
+          </div>
+
+          <!-- Timeline do Curso (Módulos e Aulas) -->
+          <div>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 20px; font-size: 12px; line-height: 1.4; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
+              <i data-lucide="sparkles" style="color: var(--success); width: 18px; height: 18px; flex-shrink: 0;"></i>
+              <div>
+                <strong>Recomendação:</strong> 
+                <span id="track-recommended-text">Inicie a primeira aula do curso para começar sua jornada adaptativa.</span>
+              </div>
+            </div>
+            
+            <!-- Trilha Dinâmica de IA -->
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px;">
+              <h3 style="font-size: 15px; margin-bottom: 8px; font-weight: 700;">Gerar Trilha Dinâmica <i data-lucide="sparkles" style="width: 14px; height: 14px; color: var(--accent-cyan);"></i></h3>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Diga o que você precisa revisar ou aprender e a IA montará uma trilha rápida.</p>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="input-dynamic-track" placeholder="Ex: Preciso revisar resistência dos materiais..." style="flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
+                <button id="btn-generate-track" class="btn-primary" style="padding: 10px 16px; font-size: 13px;">Gerar</button>
+              </div>
+              <div id="dynamic-track-results" style="margin-top: 16px; display: none; flex-direction: column; gap: 10px;"></div>
+            </div>
+
+            <div class="track-timeline-tree" id="track-timeline-container" style="display: flex; flex-direction: column; gap: 24px;">
+              <!-- Inserido via JS pelo tracker.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 6: LABORATÓRIO (SIMULAÇÃO FÍSICA AVANÇADA)
+           =================================================================== -->
+      <section class="screen" id="screen-lab">
+        <div class="explorar-header">
+          <h1 style="font-family: var(--font-title); font-size: 26px; font-weight: 800;">Laboratório de Prática</h1>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Explore simulações físicas, teste hipóteses industriais e resolva desafios práticos com validação imediata.</p>
+        </div>
+
+        <div class="lab-layout">
+          <!-- Sidebar Navigation -->
+          <div class="lab-sidebar" style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="lab-tab-btn active" data-tab="experiments" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-surface-elevated); border: 1px solid var(--primary); color: var(--text-primary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="flask-conical" style="color: var(--accent-cyan); width: 18px; height: 18px;"></i>
+              <span>Experimentos</span>
+            </button>
+            <button class="lab-tab-btn" data-tab="challenges" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="zap" style="color: var(--warning); width: 18px; height: 18px;"></i>
+              <span>Desafios Rápidos</span>
+            </button>
+            <button class="lab-tab-btn" data-tab="cases" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="briefcase" style="color: var(--success); width: 18px; height: 18px;"></i>
+              <span>Casos Reais</span>
+            </button>
+            <button class="lab-tab-btn" data-tab="curiosities" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="lightbulb" style="color: var(--warning); width: 18px; height: 18px;"></i>
+              <span>Curiosidades</span>
+            </button>
+            <button class="lab-tab-btn" data-tab="tests" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="help-circle" style="color: var(--primary); width: 18px; height: 18px;"></i>
+              <span>Testar Conhecimentos</span>
+            </button>
+            <button class="lab-tab-btn" data-tab="reviews" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s;">
+              <i data-lucide="rotate-ccw" style="color: var(--error); width: 18px; height: 18px;"></i>
+              <span>Revisão Inteligente</span>
+            </button>
+          </div>
+
+          <!-- Main Content Area -->
+          <div class="lab-main" style="display: flex; flex-direction: column; gap: 20px; flex: 1;">
+            <div id="lab-category-header" class="glass-card" style="padding: 16px 20px;">
+              <h2 id="lab-category-title" style="font-family: var(--font-title); font-size: 18px; font-weight: 700;">Experimentos Interativos</h2>
+              <p id="lab-category-desc" style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Simule variáveis reais, manipule e teste o comportamento físico e lógico dos sistemas.</p>
+            </div>
+
+            <!-- Item List Container -->
+            <div id="lab-items-grid" class="explorar-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; width: 100%;">
+              <!-- Filled dynamically via JS -->
+            </div>
+
+            <!-- Interactive Widget Container (hidden by default) -->
+            <div id="lab-widget-card" class="glass-card" style="display: none; padding: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="lab-widget-title" style="font-family: var(--font-title); font-size: 18px;">Simulador</h3>
+                <button class="btn-secondary" id="btn-back-to-list" style="padding: 6px 12px; border-radius: var(--radius-md); font-size: 12px;">
+                  <i data-lucide="arrow-left" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i>
+                  <span>Voltar para a Lista</span>
+                </button>
+              </div>
+              
+              <div id="lab-widget-viewport" style="width: 100%;">
+                <!-- The interactive SVG/widgets will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 7: TUTOR IA (CHAT DEDICADO FULL SCREEN)
+           =================================================================== -->
+      <section class="screen" id="screen-tutor">
+        <div class="explorar-header">
+          <h1 style="font-family: var(--font-title); font-size: 26px; font-weight: 800;">Tutor Inteligente de Engenharia</h1>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Diálogo socrático para te auxiliar a deduzir equações, diagramas e fórmulas sem entregar respostas prontas.</p>
+        </div>
+
+        <div class="tutor-full-screen-layout">
+          <!-- Histórico de Aprendizado IA -->
+          <div class="tutor-full-sidebar">
+            <h3 style="font-family: var(--font-title); font-size: 15px;">Memória Educacional</h3>
+            <p style="font-size: 12px; color: var(--text-secondary);">Conceitos que você está praticando:</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;" id="ai-memory-skills-list">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+          
+          <!-- Container de Chat Principal -->
+          <div class="tutor-full-chat">
+            <div class="tutor-messages-container" id="tutor-full-messages">
+              <!-- Mensagens Iniciais do Tutor -->
+            </div>
+            
+            <!-- Ações Rápidas -->
+            <div class="tutor-quick-actions" id="tutor-full-quick-actions">
+              <button class="quick-action-chip" data-query="Explique o que é um vetor e como representamos grandezas vetoriais">Vetores e Álgebra</button>
+              <button class="quick-action-chip" data-query="Como funciona o método AHP para comparar alternativas?">Método AHP (AMD)</button>
+              <button class="quick-action-chip" data-query="Qual a diferença entre erro absoluto e erro relativo em cálculo numérico?">Erros Numéricos</button>
+              <button class="quick-action-chip" data-query="O que é o limite de escoamento no ensaio de tração?">Ensaio de Tração</button>
+            </div>
+            
+            <!-- Barra de Input de Texto -->
+            <div class="tutor-input-area">
+              <input type="text" id="tutor-full-input-field" placeholder="Pergunte sobre conceitos, fórmulas ou setups...">
+              <button class="btn-send-message" id="btn-tutor-full-send"><i data-lucide="send" style="width:16px; height:16px;"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 8: PROGRESSO (E PERFIL DETALHADO)
+           =================================================================== -->
+      <section class="screen" id="screen-profile">
+        <div id="dashboard-container" class="dashboard-container">
+          <div class="dash-cover-banner" id="dash-cover-banner"></div>
+          
+          <div class="dash-cover-controls">
+            <button id="btn-change-dash-bg" class="btn-dash-bg"><i data-lucide="image" style="width:14px;height:14px;"></i> Mudar Fundo</button>
+            <div id="bg-popover" class="bg-popover">
+              <div class="bg-tabs">
+                <span class="bg-tab active" data-tab="upload">Upload</span>
+                <span class="bg-tab" data-tab="link">Link</span>
+              </div>
+              <div class="bg-tab-content active" id="bg-tab-upload">
+                <input type="file" id="bg-upload-input" accept="image/*" class="dash-input-file">
+                <small style="color:var(--text-muted); font-size:10px;">Comprimido para base64 localmente</small>
+              </div>
+              <div class="bg-tab-content" id="bg-tab-link" style="display:none;">
+                <input type="text" id="bg-link-input" placeholder="https://..." class="dash-input-text" style="width:100%; padding:5px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:4px;">
+                <button id="btn-apply-bg-link" class="btn-dash primary" style="width:100%; margin-top:10px;">Aplicar</button>
+              </div>
+              <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                <label style="display:flex; align-items:center; gap:5px; font-size:11px; cursor:pointer;">
+                  <input type="checkbox" id="bg-reposition-toggle"> Reposicionar (Arraste)
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dashboard-grid">
+            <!-- COLUNA 1 -->
+            <div class="dash-col">
+              <!-- Módulo 1: Timer -->
+              <div class="dash-widget widget-timer" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="pomodoro-ring-container">
+                  <svg class="pomodoro-svg" width="180" height="180" viewBox="0 0 180 180">
+                    <circle class="pomodoro-bg" cx="90" cy="90" r="80"></circle>
+                    <circle class="pomodoro-progress" id="pomodoro-progress-circle" cx="90" cy="90" r="80"></circle>
+                  </svg>
+                  <div class="digital-display center-timer" id="digital-timer">25:00</div>
+                  <i data-lucide="settings" id="btn-open-pomodoro-settings" class="pomodoro-settings-icon"></i>
+                </div>
+                <div class="timer-controls" style="margin-top:20px;">
+                  <button id="btn-timer-start" class="btn-dash primary">Iniciar</button>
+                  <button id="btn-timer-pause" class="btn-dash">Pausar</button>
+                  <button id="btn-timer-reset" class="btn-dash">Reset</button>
+                </div>
+              </div>
+
+              <!-- Módulo 2: To-Do -->
+              <div class="dash-widget widget-todo">
+                <h3 style="font-size:16px; margin-bottom:15px;">To-Do List (Estilo Todoist)</h3>
+                <div id="todo-container"></div>
+              </div>
+            </div>
+
+            <!-- COLUNA 2 -->
+            <div class="dash-col">
+              <!-- Módulo 3: Editor WYSIWYG -->
+              <div class="dash-widget widget-editor-layout">
+                <div class="editor-sidebar">
+                  <h4 style="margin-bottom:10px; font-size:12px; color:var(--text-muted);">Meus Cadernos</h4>
+                  <ul class="notebook-list">
+                    <li><i data-lucide="folder" style="width:14px;height:14px;"></i> Semestre 1</li>
+                    <li><i data-lucide="folder" style="width:14px;height:14px;"></i> Semestre 2</li>
+                  </ul>
+                  <h4 style="margin-top:20px; margin-bottom:10px; font-size:12px; color:var(--text-muted);">Anotações de Aula</h4>
+                  <ul class="notebook-list">
+                    <li class="active">Vetores - Dia 1</li>
+                    <li>Soma Ponderada</li>
+                  </ul>
+                </div>
+                <div class="editor-main">
+                  <div class="editor-header">
+                    <h2 style="font-size:22px;">Vetores - Dia 1</h2>
+                  </div>
+                  <div class="editor-toolbar">
+                    <button class="tool-btn" data-cmd="bold" title="Negrito"><b>B</b></button>
+                    <button class="tool-btn" data-cmd="italic" title="Itálico"><i>I</i></button>
+                    <button class="tool-btn" data-cmd="underline" title="Sublinhado"><u>U</u></button>
+                    <button class="tool-btn" data-cmd="insertUnorderedList" title="Lista"><i data-lucide="list" style="width:14px;height:14px;"></i></button>
+                  </div>
+                  <div class="editor-content" id="rich-editor" contenteditable="true">
+                    <h3>Pontos Principais</h3>
+                    <ul>
+                      <li>Álgebra Vetorial básica</li>
+                      <li>Critérios e Alternativas</li>
+                    </ul>
+                    <br>
+                    <h3>Anotações/Rascunhos do Aluno</h3>
+                    <p>Comece a digitar aqui...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUNA 3 -->
+            <div class="dash-col">
+              <!-- Módulo 4: Calendário -->
+              <div class="dash-widget widget-calendar">
+                <div class="cal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                  <h3 style="font-size:16px;">Calendário e Atividades</h3>
+                  <button class="btn-dash" title="Importar Externo"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i></button>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+                  <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div class="cal-grid" id="dash-cal-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">
+                  <!-- Gerado via JS -->
+                </div>
+                
+                <div class="cal-accordions" style="margin-top: 20px;">
+                  <details class="dash-accordion">
+                    <summary>Atividades Passadas</summary>
+                    <div class="acc-content">
+                      <p style="font-size:12px; color:var(--text-secondary);">Nenhuma atividade registrada.</p>
+                    </div>
+                  </details>
+                  <details class="dash-accordion" open>
+                    <summary>Próximas Atividades</summary>
+                    <div class="acc-content">
+                      <div class="upcoming-item">
+                        <i data-lucide="bell" style="width:14px;height:14px;"></i>
+                        <span>Adicionar Lembrete/Rascunho</span>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Módulo 5: Pop-up Professor -->
+          <div class="dash-popup-ia" id="dash-tutor-popup">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <i data-lucide="bot" style="color:var(--axion-cyan); margin-top:2px;"></i>
+              <div>
+                <strong>Sugestão de Reagendamento:</strong>
+                <p style="font-size:12px; margin-top:4px;">O Professor notou uma lacuna no seu calendário. Que tal mover o rascunho de Ensaios Não Destrutivos para amanhã?</p>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                  <button class="btn-dash primary btn-ia-action" style="padding:4px 10px; font-size:11px;">Aceitar</button>
+                  <button class="btn-dash btn-ia-action" style="padding:4px 10px; font-size:11px;">Recusar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Módulo 6: Dock macOS -->
+          <div class="dash-dock">
+            <div class="dock-item" data-tooltip="Caderno" id="dock-btn-note">
+              <i data-lucide="book" style="width:20px;height:20px;"></i>
+            </div>
+            <div class="dock-item" data-tooltip="Livro" id="dock-btn-study">
+              <i data-lucide="book-open" style="width:20px;height:20px;"></i>
+            </div>
+            <div class="dock-item" data-tooltip="Modo Foco" id="dock-btn-focus">
+              <i data-lucide="lightbulb" style="width:20px;height:20px;"></i>
+            </div>
+            <div class="dock-item" data-tooltip="Pesquisa (Ctrl+K)" id="dock-btn-search">
+              <i data-lucide="compass" style="width:20px;height:20px;"></i>
+            </div>
+          </div>
+
+          <!-- Modais Ocultos do Dashboard -->
+          <div class="dash-modal" id="modal-quick-note">
+            <div class="dash-modal-content">
+              <h3>Nota Rápida</h3>
+              <textarea placeholder="Escreva algo rapidamente..." style="width:100%; height:150px; margin-top:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:10px; border-radius:8px; resize:none;"></textarea>
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="btn-dash btn-close-modal">Cancelar</button>
+                <button class="btn-dash primary btn-close-modal">Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-modal" id="modal-global-search">
+            <div class="dash-modal-content">
+              <h3>Pesquisa Global</h3>
+              <input type="text" placeholder="Pesquisar Trilhas, Aulas e Tarefas (Ctrl+K)..." style="width:100%; margin-top:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:10px; border-radius:8px;">
+              <ul style="list-style:none; padding:0; margin-top:15px; font-size:12px; color:var(--text-secondary);">
+                <li style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); cursor:pointer;">🔍 Ensaio por Ultrassom (Aula)</li>
+                <li style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); cursor:pointer;">🔍 ASME Sec. VIII (Caderno)</li>
+                <li style="padding:8px; cursor:pointer;">🔍 Qualificação de Soldagem (Tarefa)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="dash-modal" id="modal-pomodoro-settings">
+            <div class="dash-modal-content">
+              <h3>Configurações do Relógio</h3>
+              <div style="margin-top:10px;">
+                <label style="font-size:12px;">Tempo de Estudo (min):</label>
+                <input type="number" id="pomodoro-study-time" value="25" style="width:100%; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:6px; border-radius:4px; margin-top:4px; margin-bottom:10px;">
+                
+                <label style="font-size:12px;">Tempo de Pausa (min):</label>
+                <input type="number" id="pomodoro-pause-time" value="5" style="width:100%; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:6px; border-radius:4px; margin-top:4px;">
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+                <button class="btn-dash btn-close-modal">Cancelar</button>
+                <button class="btn-dash primary" id="btn-save-pomodoro">Salvar</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TELA 9: MODO FOCADO DA AULA (/lesson/:lessonId)
+           =================================================================== -->
+      <section class="screen" id="screen-lesson">
+        <div class="lesson-player-layout">
+          
+          <!-- Cabeçalho Focado -->
+          <div class="focused-lesson-header">
+            <div class="focused-lesson-title-area">
+              <button class="btn-exit-lesson" id="btn-lesson-close" title="Voltar para a Trilha">
+                <i data-lucide="arrow-left" style="width: 18px; height:18px;"></i>
+              </button>
+              <div class="focused-progress-bar-container">
+                <span class="lesson-title-mini" id="lesson-mini-title" style="font-size: 11px; text-align: left;">Aula Ativa</span>
+                <div class="focused-progress-track">
+                  <div class="focused-progress-fill" id="lesson-steps-progress-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <span class="lesson-step-counter-text" id="lesson-step-counter-text" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Etapa 1/8</span>
+              <button class="btn-secondary" id="btn-open-lesson-tutor" style="padding: 6px 12px; border-radius: var(--radius-full); font-size: 12px;">
+                <i data-lucide="bot" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                <span>Professor</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Corpo central focado (com largura confortável de 720px) -->
+          <div class="focused-lesson-body">
+            <div class="lesson-card glass-card" id="lesson-step-card" style="padding: 40px;">
+              
+              <!-- Texto / Explicações / Exemplo -->
+              <div id="lesson-error-container" style="display: none; padding: 20px; color: var(--error); text-align: center; font-weight: bold;"></div>
+              <div class="step-content-section" id="step-content-render">
+                <!-- Carregado dinamicamente -->
+              </div>
+
+              <!-- Simulador de Gargalos do Módulo (Renderizado quando step_type = 'simulation') -->
+              <div class="step-simulation-section" id="step-simulation-container" style="display: none;">
+                
+                <!-- Wrapper para Simulação de Gargalo de Produção -->
+                <div id="lesson-simulation-conveyor-wrapper">
+                  <!-- Reutiliza o simulador idêntico ao do laboratório para consistência -->
+                  <div class="sim-header-row" style="margin-bottom: 12px;">
+                    <h4 style="font-family: var(--font-title); font-size: 16px;">Laboratório Interativo</h4>
+                    <div class="sim-controls-toolbar">
+                      <button class="btn-sim-control active" id="btn-sim-lesson-play"><i data-lucide="play" style="width:14px; height:14px;"></i></button>
+                      <button class="btn-sim-control" id="btn-sim-lesson-pause"><i data-lucide="pause" style="width:14px; height:14px;"></i></button>
+                    </div>
+                  </div>
+                  
+                  <div class="production-line-graphics" id="lesson-graphics-viewport">
+                    <div class="conveyor-belt">
+                      <div class="prod-node" id="lesson-node-corte">
+                        <div class="node-icon-wrapper"><i data-lucide="scissors"></i></div>
+                        <span class="node-title">Corte</span>
+                        <span class="node-cycle-time" id="lesson-node-corte-label">4.0 min</span>
+                        <div class="node-queue-indicator" id="lesson-queue-corte"></div>
+                      </div>
+                      <div class="conveyor-arrow"><i data-lucide="chevron-right"></i></div>
+                      
+                      <div class="prod-node" id="lesson-node-montagem">
+                        <div class="node-icon-wrapper"><i data-lucide="wrench"></i></div>
+                        <span class="node-title">Montagem</span>
+                        <span class="node-cycle-time" id="lesson-node-montagem-label">7.0 min</span>
+                        <div class="node-queue-indicator" id="lesson-queue-montagem"></div>
+                      </div>
+                      <div class="conveyor-arrow"><i data-lucide="chevron-right"></i></div>
+                      
+                      <div class="prod-node" id="lesson-node-inspecao">
+                        <div class="node-icon-wrapper"><i data-lucide="eye"></i></div>
+                        <span class="node-title">Inspeção</span>
+                        <span class="node-cycle-time" id="lesson-node-inspecao-label">5.0 min</span>
+                        <div class="node-queue-indicator" id="lesson-queue-inspecao"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="simulation-dashboard" style="margin-top: 14px; grid-template-columns: 1fr 1fr;">
+                    <div class="sim-dashboard-item"><span class="sim-dash-label" style="font-size: 10px;">Gargalo</span><span class="sim-dash-value" id="lesson-bottleneck-name" style="font-size: 14px; color: var(--warning);">Montagem</span></div>
+                    <div class="sim-dashboard-item"><span class="sim-dash-label" style="font-size: 10px;">Capacidade Máxima</span><span class="sim-dash-value highlight" id="lesson-capacity-value" style="font-size: 14px;">8.57 pçs/h</span></div>
+                  </div>
+                  
+                  <div class="simulation-controls" style="margin-top: 14px;">
+                    <div class="control-group">
+                      <div class="control-label-row" style="font-size: 12px;"><span>Tempo Corte:</span><span class="slider-value" id="lesson-val-corte">4.0 min</span></div>
+                      <input type="range" class="sim-slider" id="lesson-slider-corte" min="2" max="10" step="0.5" value="4">
+                    </div>
+                    <div class="control-group" style="margin-top: 8px;">
+                      <div class="control-label-row" style="font-size: 12px;"><span>Tempo Montagem:</span><span class="slider-value" id="lesson-val-montagem">7.0 min</span></div>
+                      <input type="range" class="sim-slider" id="lesson-slider-montagem" min="2" max="10" step="0.5" value="7">
+                    </div>
+                    <div class="control-group" style="margin-top: 8px;">
+                      <div class="control-label-row" style="font-size: 12px;"><span>Tempo Inspeção:</span><span class="slider-value" id="lesson-val-inspecao">5.0 min</span></div>
+                      <input type="range" class="sim-slider" id="lesson-slider-inspecao" min="2" max="10" step="0.5" value="5">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Wrapper para as 4 Simulações Customizadas SVG -->
+                <div id="lesson-simulation-custom-wrapper"></div>
+
+              </div>
+
+              <!-- Exercícios de Aulas (Múltipla Escolha / Entrada Numérica / Ordenação) -->
+              <div class="step-exercise-section" id="step-exercise-container" style="display: none; margin-top: 0; border-top: none; padding-top: 0;">
+                <div class="exercise-statement" id="exercise-statement-text" style="font-size: 15px; margin-bottom: 16px;">
+                  Enunciado do exercício.
+                </div>
+                
+                <!-- Alternativas Múltipla Escolha -->
+                <div class="exercise-options-container" id="exercise-options-list" style="display: none; gap: 10px;">
+                  <!-- Inserido dinamicamente -->
+                </div>
+
+                <!-- Entrada Numérica -->
+                <div class="exercise-numeric-container" id="exercise-numeric-input-wrapper" style="display: none; margin: 0;">
+                  <div class="numeric-input-group" style="max-width: 100%;">
+                    <input type="number" step="any" id="exercise-numeric-field" placeholder="Insira o valor calculado...">
+                    <span class="numeric-unit">peças/hora</span>
+                  </div>
+                </div>
+                
+                <!-- Ordenação de Etapas (Novo Componente) -->
+                <div class="exercise-options-container" id="exercise-ordering-container" style="display: none; gap: 8px;">
+                  <!-- Elementos de ordenação inseridos com botões de movimentação -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Rodapé Fixo Focado -->
+          <footer class="focused-lesson-footer">
+            
+            <!-- Sheet de Feedback de Resposta -->
+            <div class="feedback-sheet" id="feedback-sheet-container" style="display: none; margin-bottom: 0;">
+              <div class="feedback-sheet-content">
+                <div class="feedback-status-row">
+                  <div class="feedback-icon-wrapper" id="feedback-icon-bg">
+                    <i data-lucide="check" id="feedback-icon"></i>
+                  </div>
+                  <div class="feedback-texts">
+                    <h3 id="feedback-title">Excelente!</h3>
+                    <p id="feedback-message">Sua resposta está correta.</p>
+                  </div>
+                </div>
+                <div class="feedback-explanation-box" id="feedback-explanation">
+                  Dica explicativa contextualizada.
+                </div>
+              </div>
+            </div>
+
+            <div class="focused-lesson-action-row">
+              <button class="btn-secondary" id="btn-lesson-back" style="visibility: hidden;">
+                <i data-lucide="chevron-left"></i>
+                <span>Anterior</span>
+              </button>
+              
+              <!-- Dica gradual botão -->
+              <button class="btn-secondary" id="btn-lesson-hint" style="display: none;">
+                <i data-lucide="lightbulb" style="width:16px; height:16px;"></i>
+                <span>Pedir dica</span>
+              </button>
+              
+              <button class="btn-primary" id="btn-lesson-primary-action">
+                <span id="btn-lesson-primary-action-text">Continuar</span>
+                <i id="btn-lesson-primary-action-icon" data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </footer>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===================================================================
+         PAINEL LATERAL RETRÁTIL DO TUTOR IA (ABERTO DE DENTRO DA AULA)
+         =================================================================== -->
+    <div id="tutor-ia-drawer">
+      <div class="tutor-header">
+        <div class="tutor-logo">
+          <i data-lucide="bot"></i>
+          <span>Professor</span>
+        </div>
+        <button class="btn-close-tutor" id="btn-close-lesson-tutor"><i data-lucide="x" style="width:20px; height:20px;"></i></button>
+      </div>
+      
+      <div class="tutor-messages-container" id="tutor-lesson-messages">
+        <!-- Conversa e dicas do Professor -->
+      </div>
+      
+      <!-- Ações rápidas socráticas -->
+      <div class="tutor-quick-actions" id="tutor-lesson-quick-actions">
+        <button class="quick-action-chip" data-query="Me dê uma pergunta orientadora para eu raciocinar sobre este exercício.">Pergunta Orientadora</button>
+        <button class="quick-action-chip" data-query="Me dê uma pequena dica sobre o conceito central deste passo.">Pequena Dica</button>
+        <button class="quick-action-chip" data-query="Mostre um exemplo análogo simples e concreto deste conceito.">Exemplo Concreto</button>
+        <button class="quick-action-chip" data-query="Explique o que estou errando sem me dar a resposta direta.">O que estou errando?</button>
+      </div>
+      
+      <div class="tutor-input-area">
+        <input type="text" id="tutor-lesson-input-field" placeholder="Escreva sua dúvida sobre o exercício...">
+        <button class="btn-send-message" id="btn-tutor-lesson-send"><i data-lucide="send" style="width:16px; height:16px;"></i></button>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Scripts do App (Definição dos módulos principais) -->
+  <script src="public/js/config.js"></script>
+  <script src="public/js/auth.js"></script>
+  <script src="public/js/adaptive.js"></script>
+  <script src="public/js/tracker.js"></script>
+  <script src="public/js/simulation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script src="public/js/workspace.js"></script>
+  <script src="public/js/dashboard/timer.js"></script>
+  <script src="public/js/dashboard/todo.js"></script>
+  <script src="public/js/dashboard/editor.js"></script>
+  <script src="public/js/dashboard/calendar.js"></script>
+  <script src="public/js/dashboard/main.js"></script>
+  <script src="public/js/tutor.js"></script>
+  <script src="public/app.js"></script>
+
+  <script src="public/js/modals.js"></script>
+  <script src="public/js/modals.js"></script>
+  <!-- Modals for Redesigned Player -->
+  <div class="modal-overlay" id="hint-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="lightbulb" style="color: var(--warning);"></i> Dica Pedagógica</h3>
+        <button class="btn-close-modal" id="btn-close-hint"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="hint-modal-text">
+        Carregando dica...
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="teacher-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="bot" style="color: var(--primary);"></i> Professor</h3>
+        <button class="btn-close-modal" id="btn-close-teacher"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="teacher-modal-text">
+        Analisando sua resposta...
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals for Redesigned Player -->
+  <div class="modal-overlay" id="hint-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="lightbulb" style="color: var(--warning);"></i> Dica Pedagógica</h3>
+        <button class="btn-close-modal" id="btn-close-hint"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="hint-modal-text">
+        Carregando dica...
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="teacher-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="bot" style="color: var(--primary);"></i> Professor</h3>
+        <button class="btn-close-modal" id="btn-close-teacher"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="teacher-modal-text">
+        Analisando sua resposta...
+      </div>
+    </div>
+  </div>
+</body>
+
+
+</html>

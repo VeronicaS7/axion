@@ -1,0 +1,9 @@
+pymupdf
+sentence-transformers
+fastapi
+uvicorn
+requests
+psycopg2-binary
+python-dotenv
+bcrypt
+pyjwt
