@@ -8,11 +8,11 @@ window.sendAITutorMessage = async function(text, isContextual = false) {
     history.push({ role: "user", content: text });
     
     try {
-        let endpoint = `http://${window.location.hostname}:8000/chat`;
+        let endpoint = `${window.CONFIG.API_URL}/chat`;
         let body = { messages: history };
         
         if (isContextual) {
-            endpoint = `http://${window.location.hostname}:8000/chat/contextual`;
+            endpoint = `${window.CONFIG.API_URL}/chat/contextual`;
             body.lesson_context = "Aula de Cálculo Numérico: Erro Absoluto e Relativo.";
         }
         
@@ -40,7 +40,8 @@ window.sendAITutorMessage = async function(text, isContextual = false) {
 
 window.fetchAiSummaryProgress = async function() {
     try {
-        const response = await fetch(`http://${window.location.hostname}:8000/ai-summary/progress`);
+        // Utiliza a API_URL global configurada no config.js
+        const response = await fetch(`${window.CONFIG.API_URL}/ai-summary/progress`);
         if (response.ok) {
             const data = await response.json();
             return data.summary;

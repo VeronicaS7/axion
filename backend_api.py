@@ -94,14 +94,9 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
         raise HTTPException(status_code=401, detail="Usuário não encontrado.")
     return user_to_public_dict(user)
 
-# Carregamento do modelo de embedding local
-model = None
-try:
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    print("SentenceTransformer loaded successfully.")
-except Exception as e:
-    print(f"Warning: SentenceTransformer not loaded: {e}")
+# IA Desacoplada: o carregamento do modelo de embedding local foi removido 
+# para reduzir o uso de memória no Render (OOM - 512 MiB limit).
+# A busca de conhecimento usará busca textual simples (ILIKE) por padrão.
 
 def search_knowledge_chunks(query_text: str, limit: int = 3):
     """
@@ -117,29 +112,7 @@ def search_knowledge_chunks(query_text: str, limit: int = 3):
         conn.close()
         return []
 
-    if model:
-        try:
-            query_embedding = model.encode([query_text])[0].tolist()
-            vec_str = "[" + ",".join(map(str, query_embedding)) + "]"
-            
-            cur.execute("""
-                SELECT c.id, c.content, c.page_number, s.filename as book_title,
-                       c.embedding <=> %s::vector AS distance
-                FROM content_chunks c
-                LEFT JOIN source_documents s ON c.source_document_id = s.id
-                WHERE c.embedding IS NOT NULL
-                ORDER BY distance ASC
-                LIMIT %s;
-            """, (vec_str, limit))
-            rows = cur.fetchall()
-            conn.close()
-            if rows:
-                return rows
-        except Exception as err:
-            conn.rollback() # Important to rollback failed transaction
-            print(f"pgvector search exception (falling back to ILIKE): {err}")
-
-    # Fallback para busca textual simples
+    # Apenas busca textual simples (fallback)
     try:
         like_pattern = f"%{query_text[:60]}%"
         cur.execute("""
@@ -177,8 +150,9 @@ import requests
 @app.get("/api/health/ai")
 def health_ai():
     status = {"ollama": False, "model": "granite4.2:3b", "api": False}
+    ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     try:
-        res = requests.get("http://localhost:11434/api/tags", timeout=3)
+        res = requests.get(f"{ollama_url}/api/tags", timeout=3)
         if res.status_code == 200:
             status["api"] = True
             models = res.json().get("models", [])
